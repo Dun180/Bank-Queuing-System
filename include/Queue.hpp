@@ -1,59 +1,105 @@
 // Queue.hpp
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
+#include <iostream>
+using namespace std;
 /*
-* é˜Ÿåˆ—
+* ¶ÓÁĞ
 */
 template<class T>
-struct Qnode{//ç»“ç‚¹
-    T *data;//æ•°æ®åŸŸ
-    Qnode<T> *next;//æŒ‡é’ˆåŸŸ
+struct Qnode{//½áµã
+    T *data;//Êı¾İÓò
+    Qnode<T> *next;//Ö¸ÕëÓò
 };
 
 template<class T>
-struct Queue{//é˜Ÿåˆ—
-    Qnode<T> *front;//å¤´æŒ‡é’ˆ
-    Qnode<T> *rear;//å°¾æŒ‡é’ˆ
+class Queue{//¶ÓÁĞ
+    public:
+    Qnode<T> *front;//Í·Ö¸Õë
+    Qnode<T> *rear;//Î²Ö¸Õë
+    Queue(){
+        Qnode<T> *node = new Qnode<T>;//³õÊ¼»¯½áµã
+        node->next = NULL;
+        node->data = NULL;
+        front = node;
+        rear = node;
+        // cout<<front<<endl;
+        // cout<<rear<<endl;
+        cout<<"³õÊ¼»¯³É¹¦"<<endl;
+    }
+    void enQueue(T data);
+    void deQueue();
+    void printQueue();
 };
-
-//åˆå§‹åŒ–é“¾é˜Ÿåˆ—
+/*
+//³õÊ¼»¯Á´¶ÓÁĞ
 template<class T>
-void creatQueue(Queue<T> *q){
-    Qnode<T> *node = new Qnode<T>;//åˆå§‹åŒ–ç»“ç‚¹
-    node->next = null;
-    node->data = null;
-    q->front = node;
-    q->rear = node;
+void creatQueue(){
+    Qnode<T> *node = new Qnode<T>;//³õÊ¼»¯½áµã
+    node->next = NULL;
+    node->data = NULL;
+    front = node;
+    rear = node;
+    cout<<front<<endl;
+    cout<<rear<<endl;
+    cout<<"³õÊ¼»¯³É¹¦"<<endl;
 }
-
-//å…¥é“¾é˜Ÿåˆ—
+*/
+//ÈëÁ´¶ÓÁĞ
 template<class T>
-void enQueue(Queue<T> *q,T data){
-    //åˆ¤æ–­é˜Ÿåˆ—æ˜¯å¦ä¸ºç©º
-    if(q->front == q->rear && q->front->data == null){//å¦‚æœé˜Ÿåˆ—ä¸ºç©º
-        q->front->data = &data;
-    }else{//å¦‚æœé˜Ÿåˆ—ä¸ä¸ºç©º
-        Qnode<T> *node = new Qnode<T>;//åˆå§‹åŒ–ç»“ç‚¹
-        node->next = null;
+void Queue<T>::enQueue(T data){
+    //ÅĞ¶Ï¶ÓÁĞÊÇ·ñÎª¿Õ
+    if(front == rear && front->data == NULL){//Èç¹û¶ÓÁĞÎª¿Õ
+        front->data = &data;
+
+    }else{//Èç¹û¶ÓÁĞ²»Îª¿Õ
+        cout<<"-------------------";
+        Qnode<T> *node = new Qnode<T>;//³õÊ¼»¯½áµã
+        node->next = NULL;
         node->data = &data;
-        q->rear->next = node;
-        q->rear = node;
+        rear->next = node;
+        rear = node;
     }
+    cout<<"Èë¶Ó³É¹¦"<<endl;
 }
 
-//å‡ºé“¾é˜Ÿåˆ—
+//³öÁ´¶ÓÁĞ
 template<class T>
-void deQueue(Queue<T> *q){
-    //åˆ¤æ–­é˜Ÿåˆ—æ˜¯å¦ä¸ºç©º
-    if(q->front == q->rear && q->front->data == null){//å¦‚æœé˜Ÿåˆ—ä¸ºç©º
-        cout<<"é˜Ÿåˆ—ä¸ºç©ºï¼Œå‡ºé˜Ÿå¤±è´¥";
-    }else if(q->front == q->rear){//åªæœ‰ä¸€ä¸ªç»“ç‚¹æ—¶
-        q->front->data == null;
-    }else{//æœ‰å¤šä¸ªç»“ç‚¹æ—¶
-        Qnode<T> *node = q->front;
-        q->front = q->front->next;//å‡ºé˜Ÿ
+void Queue<T>::deQueue(){
+    //ÅĞ¶Ï¶ÓÁĞÊÇ·ñÎª¿Õ
+    if(front == rear && front->data == NULL){//Èç¹û¶ÓÁĞÎª¿Õ
+        cout<<"¶ÓÁĞÎª¿Õ£¬³ö¶ÓÊ§°Ü"<< endl;
+    }else if(front == rear){//Ö»ÓĞÒ»¸ö½áµãÊ±
+        front->data = NULL;
+        cout<<"³ö¶Ó³É¹¦(µ¥½áµã"<<endl;
+    }else{//ÓĞ¶à¸ö½áµãÊ±
+        Qnode<T> *node = front;
+        front = front->next;//³ö¶Ó
         delete node;
+        cout<<"³ö¶Ó³É¹¦"<<endl;
     }
 }
 
+//±éÀú¶ÓÁĞ
+template<class T>
+void Queue<T>::printQueue(){
+        //ÅĞ¶Ï¶ÓÁĞÊÇ·ñÎª¿Õ
+    if(front == rear && front->data == NULL){//Èç¹û¶ÓÁĞÎª¿Õ
+        cout<<"¶ÓÁĞÎª¿Õ"<<endl;
+    }else{
+        cout<<"------------------"<<endl;
+        Qnode<T> *node = front;
+        do{
+        if(node->data != NULL){
+            cout<<*(node->data)<<endl;
+        }
+        if(node->next!=NULL){
+            node = node->next;
+        }else{
+            break;
+        }
+        }while(1);
+        cout<<"--------------------"<<endl;
+    }
+}
 #endif
