@@ -2,11 +2,7 @@
 // Menu.hpp
 #ifndef MENU_HPP
 #define MENU_HPP
-#include <iostream>
-#include <array>
-#include <conio.h>
-#include <windows.h>
-using namespace std;
+#include "Utils.hpp"
 class Menu{
     public:
     void static mainMenu();
@@ -17,15 +13,21 @@ class Menu{
 void Menu::mainMenu()
 {
     array<string, 3> options = {
-        "游客菜单",
-        "管理员菜单",
+        "开始模拟",
+        "取号",
         "退出"};
-    system("mode con cols=110 lines=40");
-    writeChar(5, 1, "欢迎进入列车时刻查询系统！", 15);
-    writeChar(3, 3, "→", 15);
+    system("mode con cols=110 lines=40");//规定大小
+    Utils::writeChar(5, 1, "欢迎进入银行排队模拟系统！", 15);
+    Utils::writeChar(3, 3, "→", 15);
+    Utils::writeChar(5, 8, "排队人数：", 15);
+    Utils::writeChar(5, 9, "预计等待时间：", 15);
+    Utils::writeChar(5, 11, "一号柜台", 15);
+    Utils::writeChar(15, 11, "二号柜台", 15);
+    Utils::writeChar(25, 11, "三号柜台", 15);
+    Utils::writeChar(35, 11, "VIP柜台", 15);
     for (int i = 0; i < options.size(); i++)
     {
-        writeChar(5, 3 + i, options[i], 15);
+        Utils::writeChar(5, 3 + i, options[i], 15);
     }
     char ch;
     int option = 0;
@@ -44,12 +46,12 @@ void Menu::mainMenu()
             {
                 if (ch == 72)
                 {
-                    writeChar(3, 3 + option, "  ", 0);
+                    Utils::writeChar(3, 3 + option, "  ", 0);
                     option--;
                 }
                 else if (ch == 80)
                 {
-                    writeChar(3, 3 + option, "  ", 0);
+                    Utils::writeChar(3, 3 + option, "  ", 0);
                     option++;
                 }
                 if (option < 0)
@@ -60,10 +62,10 @@ void Menu::mainMenu()
                 {
                     option--;
                 }
-                writeChar(3, 3 + option, "                         ", 0);
+                Utils::writeChar(3, 3 + option, "                         ", 0);
                 Sleep(100);
-                writeChar(3, 3 + option, "→", 15);
-                writeChar(5, 3 + option, options[option], 15);
+                Utils::writeChar(3, 3 + option, "→", 15);
+                Utils::writeChar(5, 3 + option, options[option], 15);
 
                 if (ch == '\r')
                 {
@@ -92,30 +94,6 @@ void Menu::mainMenu()
     }
 }
 
-void Menu::writeChar(int x, int y, string pchar, char color)
-{
-    CONSOLE_CURSOR_INFO cci;
-    cci.dwSize = 1;
-    cci.bVisible = FALSE;
-    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
-
-    COORD loc = {x, y};
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), loc);
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-    cout << pchar;
-}
-void Menu::cleanConsole(int x, int y)
-{
-    COORD loc;
-    loc.Y = y;
-    for (int i = 0; i < x; i++)
-    {
-        loc.X = i;
-        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), loc);
-        cout << " " << endl;
-        ;
-    }
-}
 
 
 

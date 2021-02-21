@@ -7,7 +7,8 @@
 */
 class Customer{
 private:
-bool isVip = false; //是否为vip
+bool isVip; //是否为vip
+int temporaryNumber; //临时编号
 
 
 
