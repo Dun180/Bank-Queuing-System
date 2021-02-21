@@ -3,10 +3,14 @@ project(BankQueuingSystem VERSION 0.1.0)
 
 include(CTest)
 enable_testing()
-
+set( src
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+)
 # add_library(BankQueuingSystem BankQueuingSystem.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)#添加头文件的搜索路径
+aux_source_directory(./src SrcFiles)#将源文件列表写在变量SrcFiles中
+set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/bin)#设置可执行文件输出路径
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

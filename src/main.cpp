@@ -1,5 +1,6 @@
 #include <iostream>
+#include "../include/Menu.hpp"
 using namespace std;
 int main(){
-    cout<<"Hello World";
+    Menu::mainMenu();
 }

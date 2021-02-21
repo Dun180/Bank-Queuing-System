@@ -17,7 +17,7 @@ class Queue{//队列
     public:
     Qnode<T> *front;//头指针
     Qnode<T> *rear;//尾指针
-    Queue(){
+    Queue(){//初始化链队列
         Qnode<T> *node = new Qnode<T>;//初始化结点
         node->next = NULL;
         node->data = NULL;
@@ -31,20 +31,7 @@ class Queue{//队列
     void deQueue();
     void printQueue();
 };
-/*
-//初始化链队列
-template<class T>
-void creatQueue(){
-    Qnode<T> *node = new Qnode<T>;//初始化结点
-    node->next = NULL;
-    node->data = NULL;
-    front = node;
-    rear = node;
-    cout<<front<<endl;
-    cout<<rear<<endl;
-    cout<<"初始化成功"<<endl;
-}
-*/
+
 //入链队列
 template<class T>
 void Queue<T>::enQueue(T data){

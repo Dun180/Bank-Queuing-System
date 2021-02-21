@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include "Menu.hpp"
 using namespace std;
@@ -71,3 +72,4 @@ void Menu::mainMenu()
 		system("cls");
 	}
 }
+*/
