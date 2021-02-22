@@ -39,12 +39,14 @@ void Function::callNumber(){
     if(counter1 == NULL || counter2 == NULL || counter3 == NULL){
     Customer *customer = wait->deQueue(); //出队
     if(counter1 == NULL){
-        counter1 == customer;
-        Utils::writeChar(5, 12, "一号柜台", 15);
+        counter1 = customer;
+        Utils::writeChar(5, 12, customer->getStringNumber(), 15);
     }else if(counter2 == NULL){
-        counter2 == customer;
+        counter2 = customer;
+        Utils::writeChar(15, 12, customer->getStringNumber(), 15);
     }else if(counter3 == NULL){
-        counter3 == customer;
+        counter3 = customer;
+        Utils::writeChar(25, 12, customer->getStringNumber(), 15);
     }
     }else{
         cout<<"柜台已满，叫号失败"<< endl;
@@ -52,7 +54,17 @@ void Function::callNumber(){
 }
 
 //叫号
-void Function::callNumber(int num){
-
+void Function::callNumber(int flag){
+    Customer *customer = wait->deQueue(); //出队
+    if(flag == 1){
+        counter1 = customer;
+        Utils::writeChar(5, 12, customer->getStringNumber(), 15);
+    }else if(flag == 2){
+        counter2 = customer;
+        Utils::writeChar(15, 12, customer->getStringNumber(), 15);
+    }else if(flag == 3){
+        counter3 = customer;
+        Utils::writeChar(25, 12, customer->getStringNumber(), 15);
+    }
 }
 #endif

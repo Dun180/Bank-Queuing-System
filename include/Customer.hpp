@@ -1,7 +1,7 @@
 // Customer.hpp
 #ifndef CUSTOMER_HPP
 #define CUSTOMER_HPP
-
+#include "Utils.hpp"
 /*
 * 顾客类
 */
@@ -18,6 +18,7 @@ public:
         }
     void setIsVip(bool isVip){this->isVip = isVip;}
     void setTemporaryNumber(int temporaryNumber){this->temporaryNumber = temporaryNumber;}
+    string getStringNumber(){return to_string(temporaryNumber);}
 };
 
 #endif
