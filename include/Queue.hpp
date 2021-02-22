@@ -17,33 +17,37 @@ class Queue{//队列
     public:
     Qnode<T> *front;//头指针
     Qnode<T> *rear;//尾指针
-    Queue(){//初始化链队列
-        Qnode<T> *node = new Qnode<T>;//初始化结点
-        node->next = NULL;
-        node->data = NULL;
-        front = node;
-        rear = node;
-        // cout<<front<<endl;
-        // cout<<rear<<endl;
-        cout<<"初始化成功"<<endl;
-    }
-    void enQueue(T data);
+    Queue();
+    void enQueue(T *data);
     void deQueue();
     void printQueue();
 };
 
+//初始化链队列
+template<class T>
+Queue<T>::Queue(){
+    Qnode<T> *node = new Qnode<T>;//初始化结点
+    node->next = NULL;
+    node->data = NULL;
+    front = node;
+    rear = node;
+    // cout<<front<<endl;
+    // cout<<rear<<endl;
+    cout<<"初始化成功"<<endl;
+}
+
 //入链队列
 template<class T>
-void Queue<T>::enQueue(T data){
+void Queue<T>::enQueue(T *data){
     //判断队列是否为空
     if(front == rear && front->data == NULL){//如果队列为空
-        front->data = &data;
+        front->data = data;
 
     }else{//如果队列不为空
         cout<<"-------------------";
         Qnode<T> *node = new Qnode<T>;//初始化结点
         node->next = NULL;
-        node->data = &data;
+        node->data = data;
         rear->next = node;
         rear = node;
     }

@@ -11,8 +11,8 @@ using namespace std;
 */
 class Utils{
 public:
-    void static writeChar(int x, int y, string pchar, char color);
-    void static cleanConsole(int x, int y);
+    void static writeChar(int x, int y, string pchar, char color);//输出
+    void static cleanConsole(int x, int y);//清空指定内容
 
 
 };
