@@ -3,6 +3,7 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 #include "Utils.hpp"
+#include "Function.hpp"
 class Menu{
     public:
     void static mainMenu();
@@ -13,8 +14,8 @@ class Menu{
 void Menu::mainMenu()
 {
     array<string, 3> options = {
-        "开始模拟",
         "取号",
+        "叫号",
         "退出"};
     system("mode con cols=110 lines=40");//规定大小
     Utils::writeChar(5, 1, "欢迎进入银行排队模拟系统！", 15);
@@ -29,6 +30,8 @@ void Menu::mainMenu()
     {
         Utils::writeChar(5, 3 + i, options[i], 15);
     }
+    Function *function = new Function;
+    do{
     char ch;
     int option = 0;
     int key = 0;
@@ -78,11 +81,16 @@ void Menu::mainMenu()
             break;
     }
 
+
+
+
     if (key == 0)
     {
+        function->getNumber();
     }
     else if (key == 1)
     {
+        function->callNumber();
     }
     else if (key == 2)
     {
@@ -92,6 +100,7 @@ void Menu::mainMenu()
     {
         exit(-1);
     }
+    }while(1);
 }
 
 

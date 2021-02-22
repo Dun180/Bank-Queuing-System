@@ -13,13 +13,13 @@ struct Qnode{//结点
 };
 
 template<class T>
-class Queue{//队列
+class Queue{    //队列
     public:
-    Qnode<T> *front;//头指针
-    Qnode<T> *rear;//尾指针
+    Qnode<T> *front;    //头指针
+    Qnode<T> *rear;     //尾指针
     Queue();
-    void enQueue(T *data);
-    void deQueue();
+    void enQueue(T *data);  //入队
+    T *deQueue(); //出队
     void printQueue();
 };
 
@@ -56,19 +56,25 @@ void Queue<T>::enQueue(T *data){
 
 //出链队列
 template<class T>
-void Queue<T>::deQueue(){
+T *Queue<T>::deQueue(){
     //判断队列是否为空
-    if(front == rear && front->data == NULL){//如果队列为空
+    if(this->front == this->rear && this->front->data == NULL){//如果队列为空
         cout<<"队列为空，出队失败"<< endl;
-    }else if(front == rear){//只有一个结点时
-        front->data = NULL;
+        return NULL;
+    }else if(this->front == this->rear){//只有一个结点时
+        Customer *customer = this->front->data;
+        this->front->data = NULL;
         cout<<"出队成功(单结点"<<endl;
+        return customer;
     }else{//有多个结点时
-        Qnode<T> *node = front;
-        front = front->next;//出队
+        Qnode<T> *node = this->front;
+        this->front = this->front->next;//出队
+        Customer *customer = node->data;
         delete node;
         cout<<"出队成功"<<endl;
+        return customer;
     }
+    return NULL;
 }
 
 //遍历队列

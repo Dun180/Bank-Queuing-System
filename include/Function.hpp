@@ -5,36 +5,54 @@
 #include "Customer.hpp"
 #include "Queue.hpp"
 /*
-* æ’é˜ŸåŠŸèƒ½å®ç°ç±»
+* ÅÅ¶Ó¹¦ÄÜÊµÏÖÀà
 */
 class Function{
     private:
-    static int number;  //ç¼–å·
-    Queue<Customer> *wait = NULL;   //æ’é˜Ÿç­‰å¾…é˜Ÿåˆ—
-    Customer *counter1 = NULL;  //ä¸€å·æŸœå°
-    Customer *counter2 = NULL;  //äºŒå·æŸœå°
-    Customer *counter3 = NULL;  //ä¸‰å·æŸœå°
-    Customer *counterVip = NULL;  //VipæŸœå°
+    static int number;  //±àºÅ
+    Queue<Customer> *wait = NULL;   //ÅÅ¶ÓµÈ´ı¶ÓÁĞ
+    Customer *counter1 = NULL;  //Ò»ºÅ¹ñÌ¨
+    Customer *counter2 = NULL;  //¶şºÅ¹ñÌ¨
+    Customer *counter3 = NULL;  //ÈıºÅ¹ñÌ¨
+    Customer *counterVip = NULL;  //Vip¹ñÌ¨
     public:
     Function();
-    void getNumber();   //å–å·
-    void callNumber();  //å«å·
+    void getNumber();   //È¡ºÅ
+    void callNumber();  //½ĞºÅ(¹ñÌ¨Î´ÂúÊ±)
+    void callNumber(int num);  //½ĞºÅ
 };
 Function::Function(){
-    wait = new Queue<Customer>(); //åˆå§‹åŒ–é˜Ÿåˆ—
+    wait = new Queue<Customer>; //³õÊ¼»¯¶ÓÁĞ
 }
-//ä»1å·å¼€å§‹å–å·
+//´Ó1ºÅ¿ªÊ¼È¡ºÅ
 int Function::number = 1;
 
-//å–å·
+//È¡ºÅ
 void Function::getNumber(){
-    Customer *customer = new Customer(false,number);    //åˆ›å»ºCustomerå¯¹è±¡
-    number++;   //numberé€’å¢
-    wait->enQueue(customer);   //å…¥ç­‰å¾…é˜Ÿåˆ—
+    Customer *customer = new Customer(false,number);    //´´½¨Customer¶ÔÏó
+    number++;   //numberµİÔö
+    wait->enQueue(customer);   //ÈëµÈ´ı¶ÓÁĞ
 }
 
-//å«å·(æŸœå°æœªæ»¡æ—¶)
+//½ĞºÅ(¹ñÌ¨Î´ÂúÊ±)
 void Function::callNumber(){
-    
+    if(counter1 == NULL || counter2 == NULL || counter3 == NULL){
+    Customer *customer = wait->deQueue(); //³ö¶Ó
+    if(counter1 == NULL){
+        counter1 == customer;
+        Utils::writeChar(5, 12, "Ò»ºÅ¹ñÌ¨", 15);
+    }else if(counter2 == NULL){
+        counter2 == customer;
+    }else if(counter3 == NULL){
+        counter3 == customer;
+    }
+    }else{
+        cout<<"¹ñÌ¨ÒÑÂú£¬½ĞºÅÊ§°Ü"<< endl;
+    }
+}
+
+//½ĞºÅ
+void Function::callNumber(int num){
+
 }
 #endif
