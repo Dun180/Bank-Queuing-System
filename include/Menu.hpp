@@ -7,8 +7,7 @@
 class Menu{
     public:
     void static mainMenu();
-    void static writeChar(int x, int y, string pchar, char color);
-    void static cleanConsole(int x, int y);
+
 };
 
 void Menu::mainMenu()
@@ -32,10 +31,10 @@ void Menu::mainMenu()
         Utils::writeChar(5, 3 + i, options[i], 15);
     }
     Function *function = new Function;
-    do{
+    int key = 0;
     char ch;
     int option = 0;
-    int key = 0;
+    do{
     bool flag = false;
     while (true)
     {

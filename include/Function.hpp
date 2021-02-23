@@ -10,6 +10,7 @@
 class Function{
     private:
     static int number;  //编号
+    static int numberOfLine;//排队人数
     Queue<Customer> *wait = NULL;   //排队等待队列
     Customer *counter1 = NULL;  //一号柜台
     Customer *counter2 = NULL;  //二号柜台
@@ -26,11 +27,16 @@ Function::Function(){
 }
 //从1号开始取号
 int Function::number = 1;
+//排队人数
+int Function::numberOfLine = 0;
 
 //取号
 void Function::getNumber(){
     Customer *customer = new Customer(false,number);    //创建Customer对象
     number++;   //number递增
+    numberOfLine++; //排队人数增加
+    Utils::cleanConsole(14,20,8);//清除上一个数据
+    Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
     wait->enQueue(customer);   //入等待队列
 }
 
@@ -38,6 +44,9 @@ void Function::getNumber(){
 void Function::callNumber(){
     if(counter1 == NULL || counter2 == NULL || counter3 == NULL){
     Customer *customer = wait->deQueue(); //出队
+    numberOfLine--; //排队人数减少
+    Utils::cleanConsole(14,20,8);//清除上一个数据
+    Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
     if(counter1 == NULL){
         counter1 = customer;
         Utils::writeChar(5, 12, customer->getStringNumber(), 15);
@@ -56,6 +65,9 @@ void Function::callNumber(){
 //叫号
 void Function::callNumber(int flag){
     Customer *customer = wait->deQueue(); //出队
+    numberOfLine--; //排队人数减少
+    Utils::cleanConsole(14,20,8);//清除上一个数据
+    Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
     if(flag == 1){
         counter1 = customer;
         Utils::writeChar(5, 12, customer->getStringNumber(), 15);

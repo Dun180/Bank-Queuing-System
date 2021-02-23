@@ -14,7 +14,7 @@ private:
     static int line;
 public:
     void static writeChar(int x, int y, string pchar, char color);//输出
-    void static cleanConsole(int x, int y);//清空指定内容
+    void static cleanConsole(int xStart,int xEnd, int y);//清空指定内容
     void static printLog(string log);//打印日志
 
 };
@@ -37,11 +37,11 @@ void Utils::writeChar(int x, int y, string pchar, char color)
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
     cout << pchar;
 }
-void Utils::cleanConsole(int x, int y)
+void Utils::cleanConsole(int xStart,int xEnd, int y)
 {
     COORD loc;
     loc.Y = y;
-    for (int i = 0; i < x; i++)
+    for (int i = xStart; i < xEnd; i++)
     {
         loc.X = i;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), loc);
