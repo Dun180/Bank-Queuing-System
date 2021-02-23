@@ -1,8 +1,7 @@
 // Queue.hpp
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include <iostream>
-using namespace std;
+#include "Utils.hpp"
 /*
 * 队列
 */
@@ -31,9 +30,7 @@ Queue<T>::Queue(){
     node->data = NULL;
     front = node;
     rear = node;
-    // cout<<front<<endl;
-    // cout<<rear<<endl;
-    cout<<"初始化成功"<<endl;
+    Utils::printLog("初始化成功");
 }
 
 //入链队列
@@ -44,14 +41,14 @@ void Queue<T>::enQueue(T *data){
         front->data = data;
 
     }else{//如果队列不为空
-        cout<<"-------------------";
+
         Qnode<T> *node = new Qnode<T>;//初始化结点
         node->next = NULL;
         node->data = data;
         rear->next = node;
         rear = node;
     }
-    cout<<"入队成功"<<endl;
+    Utils::printLog("入队成功");
 }
 
 //出链队列
@@ -59,19 +56,19 @@ template<class T>
 T *Queue<T>::deQueue(){
     //判断队列是否为空
     if(this->front == this->rear && this->front->data == NULL){//如果队列为空
-        cout<<"队列为空，出队失败"<< endl;
+        Utils::printLog("队列为空，出队失败");
         return NULL;
     }else if(this->front == this->rear){//只有一个结点时
         Customer *customer = this->front->data;
         this->front->data = NULL;
-        cout<<"出队成功(单结点"<<endl;
+        Utils::printLog("出队成功(单结点");
         return customer;
     }else{//有多个结点时
         Qnode<T> *node = this->front;
         this->front = this->front->next;//出队
         Customer *customer = node->data;
         delete node;
-        cout<<"出队成功"<<endl;
+        Utils::printLog("出队成功");
         return customer;
     }
     return NULL;

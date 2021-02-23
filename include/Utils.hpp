@@ -10,12 +10,21 @@ using namespace std;
 * 工具类
 */
 class Utils{
+private:
+    static int line;
 public:
     void static writeChar(int x, int y, string pchar, char color);//输出
     void static cleanConsole(int x, int y);//清空指定内容
-
+    void static printLog(string log);//打印日志
 
 };
+int Utils::line = 20;
+
+void Utils::printLog(string log){
+    Utils::writeChar(5, Utils::line,log, 15);
+    Utils::line++;
+}
+
 void Utils::writeChar(int x, int y, string pchar, char color)
 {
     CONSOLE_CURSOR_INFO cci;
