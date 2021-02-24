@@ -12,10 +12,11 @@ class Menu{
 
 void Menu::mainMenu()
 {
-    array<string, 4> options = {
+    array<string, 5> options = {
         "取号",
         "叫号",
         "叫号1",
+        "开始模拟",
         "退出"};
     system("mode con cols=110 lines=40");//规定大小
     Utils::writeChar(5, 1, "欢迎进入银行排队模拟系统！", 15);
@@ -97,6 +98,9 @@ void Menu::mainMenu()
         function->callNumber(2);
     }
     else if (key == 3){
+        function->simulation();
+    }
+    else if (key == 4){
         exit(0);
     }
     else
