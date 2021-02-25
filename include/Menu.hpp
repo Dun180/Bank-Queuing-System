@@ -98,7 +98,7 @@ void Menu::mainMenu()
         function->callNumber(2);
     }
     else if (key == 3){
-        function->simulation();
+        function->createSimulation();
     }
     else if (key == 4){
         exit(0);

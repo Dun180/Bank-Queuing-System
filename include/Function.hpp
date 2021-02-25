@@ -23,7 +23,9 @@ class Function{
     Customer *getCustomerNumber();   //取号(返回Customer对象)
     void callNumber();  //叫号(柜台未满时)
     void callNumber(int num);  //叫号
-    void simulation();  //模拟
+    void callNumberAccordingToTime(); //根据时间叫号
+    void createSimulation();  //创建模拟
+    void transactionProcessing();   //事务处理
 };
 Function::Function(){
     wait = new Queue<Customer>; //初始化队列
@@ -103,8 +105,8 @@ void Function::callNumber(int flag){
     }
 }
 
-//模拟
-void Function::simulation(){
+//创建模拟
+void Function::createSimulation(){
     int wait = random(10,20);  //随机生成10~20个排队等待人员
     for(int i = 0; i < wait; i++){
         getNumber();    //取号
@@ -112,5 +114,20 @@ void Function::simulation(){
     }
     Utils::cleanConsole(18,40,9);//清除上一个数据
     Utils::writeChar(19, 9, to_string(waitTime), 15);//打印等待时间
+}
+
+//根据时间叫号
+void Function::callNumberAccordingToTime(){
+    Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
+    if(customer == NULL){
+        Utils::printLog("无等待人员，叫号失败");
+        return;
+    }
+    Sleep(1000*customer->getWaitTime());    //等候顾客处理事务
+}
+
+//事务处理
+void transactionProcessing(){
+
 }
 #endif

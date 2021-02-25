@@ -13,13 +13,15 @@ struct Qnode{//结点
 
 template<class T>
 class Queue{    //队列
-    public:
+    private:
     Qnode<T> *front;    //头指针
     Qnode<T> *rear;     //尾指针
+    public:
     Queue();
     void enQueue(T *data);  //入队
     T *deQueue(); //出队
     void printQueue();
+    Qnode<T> *getFront(){return front;} //获取头指针
 };
 
 //初始化链队列
