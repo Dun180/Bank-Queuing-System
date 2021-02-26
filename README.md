@@ -8,3 +8,6 @@
 2.加入模拟前面排队人数的功能
 3.加入评价功能
 4.完善vip功能
+
+线程demo：
+https://blog.csdn.net/BJUT_bluecat/article/details/89943936

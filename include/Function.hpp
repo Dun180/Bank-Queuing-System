@@ -25,7 +25,8 @@ class Function{
     void callNumber(int num);  //叫号
     void callNumberAccordingToTime(); //根据时间叫号
     void createSimulation();  //创建模拟
-    void transactionProcessing();   //事务处理
+    void transactionProcessing(int flag);   //事务处理
+    void multithreading();   //多个事务同时处理
 };
 Function::Function(){
     wait = new Queue<Customer>; //初始化队列
@@ -127,7 +128,52 @@ void Function::callNumberAccordingToTime(){
 }
 
 //事务处理
-void transactionProcessing(){
+void Function::transactionProcessing(int flag){
+
+    do{
+    //默认开始时柜台已满
+    //判断执行工作的柜台
+    Customer *counter = NULL;
+    if(flag == 1){
+        counter = counter1;
+    }else if(flag == 2){
+        counter = counter2;
+    }else if(flag == 3){
+        counter = counter3;
+    }
+    //等待当前柜台人员办理业务
+    Sleep(1000*counter->getWaitTime());
+    delete(counter);
+    Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
+    if(customer == NULL){
+        Utils::printLog("无等待人员，叫号失败");
+        break;
+    }
+    wait->deQueue();//出队
+    numberOfLine--; //排队人数减少
+    Utils::cleanConsole(14,20,8);//清除上一个数据
+    Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
+    if(flag == 1){
+        counter1 = customer;
+        Utils::writeChar(5, 12, customer->getStringNumber(), 15);
+    }else if(flag == 2){
+        counter2 = customer;
+        Utils::writeChar(15, 12, customer->getStringNumber(), 15);
+    }else if(flag == 3){
+        counter3 = customer;
+        Utils::writeChar(25, 12, customer->getStringNumber(), 15);
+    }
+
+    }while(wait->getFront()->data != NULL);
+}
+
+void Function::multithreading(){
+
+
+    thread th1(transactionProcessing,1,this);
+    thread th2(transactionProcessing,2,this);
+
+
 
 }
 #endif

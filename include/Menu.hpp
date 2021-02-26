@@ -95,7 +95,7 @@ void Menu::mainMenu()
     }
     else if (key == 2)
     {
-        function->callNumber(2);
+        function->multithreading();
     }
     else if (key == 3){
         function->createSimulation();
