@@ -2,6 +2,7 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include "Utils.hpp"
+
 /*
 * 队列
 */
@@ -16,6 +17,7 @@ class Queue{    //队列
     private:
     Qnode<T> *front;    //头指针
     Qnode<T> *rear;     //尾指针
+    YLog ylog;
     public:
     Queue();
     void enQueue(T *data);  //入队
@@ -26,7 +28,7 @@ class Queue{    //队列
 
 //初始化链队列
 template<class T>
-Queue<T>::Queue(){
+Queue<T>::Queue():ylog(YLog::INFO, "../log/log.txt", YLog::OVER){
     Qnode<T> *node = new Qnode<T>;//初始化结点
     node->next = NULL;
     node->data = NULL;
@@ -51,6 +53,8 @@ void Queue<T>::enQueue(T *data){
         rear = node;
     }
     Utils::printLog("入队成功");
+    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "let me watch a's value",ylogNull);
+
 }
 
 //出链队列

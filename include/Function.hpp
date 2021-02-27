@@ -170,9 +170,10 @@ void Function::transactionProcessing(int flag){
 void Function::multithreading(){
 
 
-    thread th1(transactionProcessing,1,this);
-    thread th2(transactionProcessing,2,this);
-
+    thread th1(&transactionProcessing,this,1);
+    thread th2(&transactionProcessing,this,2);
+    th1.join();
+    th2.join();
 
 
 }

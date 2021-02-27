@@ -8,8 +8,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <thread>
+#include "ylog.hpp"
 #define random(a,b) (rand() % (b-a+1))+ a;  //获取[a,b]的随机整数
 using namespace std;
+
+char ylogNull = '\0';
 /*
 * 工具类
 */
@@ -17,8 +20,8 @@ class Utils{
 private:
     static int line;
 public:
-    void static writeChar(int x, int y, string pchar, char color);//输出
-    void static cleanConsole(int xStart,int xEnd, int y);//清空指定内容
+    void static writeChar(short x, short y, string pchar, char color);//输出
+    void static cleanConsole(short xStart,short xEnd, short y);//清空指定内容
     void static printLog(string log);//打印日志
 
 };
@@ -29,7 +32,7 @@ void Utils::printLog(string log){
     Utils::line++;
 }
 
-void Utils::writeChar(int x, int y, string pchar, char color)
+void Utils::writeChar(short x, short y, string pchar, char color)
 {
     CONSOLE_CURSOR_INFO cci;
     cci.dwSize = 1;
@@ -41,11 +44,11 @@ void Utils::writeChar(int x, int y, string pchar, char color)
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
     cout << pchar;
 }
-void Utils::cleanConsole(int xStart,int xEnd, int y)
+void Utils::cleanConsole(short xStart,short xEnd, short y)
 {
     COORD loc;
     loc.Y = y;
-    for (int i = xStart; i < xEnd; i++)
+    for (short i = xStart; i < xEnd; i++)
     {
         loc.X = i;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), loc);
