@@ -40,8 +40,11 @@ build/*
 # test
 test/*
 
-#samples
+# samples
 samples/*
 
-#log
+# log
 /log/log.txt
+
+# error
+error/*

@@ -18,7 +18,6 @@ class Function{
     Customer *counter2 = NULL;  //二号柜台
     Customer *counter3 = NULL;  //三号柜台
     Customer *counterVip = NULL;  //Vip柜台
-    YLog ylog;  //日志
     mutex m;    //创建互斥锁对象
     vector<thread> wins_thread;//线程窗口 每个线程对应下标相同的窗口
     vector<BusinessWindow> wins;//窗口
@@ -36,7 +35,7 @@ class Function{
     void multithreading();   //多线程
     void progressBar(int win); //进度条
 };
-Function::Function():ylog(YLog::INFO, "../log/log.txt", YLog::OVER){
+Function::Function(){
     wait = new Queue<Customer>; //初始化队列
     //初始化窗口
     for(int i=0;i<numOfWindow;i++)
@@ -86,7 +85,7 @@ void Function::callNumber(){
         Customer *customer = wait->deQueue(); //出队
         if(customer == NULL){
             Utils::printLog("无等待人员，叫号失败");
-            this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
             return;
         }
     numberOfLine--; //排队人数减少
@@ -102,7 +101,7 @@ void Function::callNumber(){
         }
     
     }else{
-        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口已满，退出",ylogNull);
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口已满，退出",ylogNull);
     }
 }
 
@@ -111,7 +110,7 @@ void Function::callNumber(int flag){
     Customer *customer = wait->deQueue(); //出队
     if(customer == NULL){
         Utils::printLog("无等待人员，叫号失败");
-        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
         return;
     }
     numberOfLine--; //排队人数减少
@@ -158,7 +157,7 @@ void Function::progressBar(int win){
 
 //事务处理
 void Function::transactionProcessing(int identifier){
-    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "线程开始",identifier);
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "线程开始",identifier);
 
     //判断柜台是否为空
 
@@ -175,7 +174,7 @@ void Function::transactionProcessing(int identifier){
         lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
         if(customer == NULL){
             Utils::printLog("无等待人员，叫号失败");
-            this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
             if(firstWindow < 0){firstWindow = identifier;}
         break;
         }
@@ -192,7 +191,7 @@ void Function::transactionProcessing(int identifier){
     {
         lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
         Utils::writeChar(5+10*identifier, 12, customer->getStringNumber(), 15);
-        this->ylog.W(__FILE__, __LINE__, YLog::INFO, to_string(identifier)+"号窗口正在办理业务的顾客为",customer->getStringNumber());
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, to_string(identifier)+"号窗口正在办理业务的顾客为",customer->getStringNumber());
     }
     }while(wait->getFront()->data != NULL);
 }

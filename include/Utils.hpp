@@ -24,9 +24,11 @@ public:
     void static writeChar(short x, short y, string pchar, char color);//输出
     void static cleanConsole(short xStart,short xEnd, short y);//清空指定内容
     void static printLog(string log);//打印日志
-
+    YLog static ylog;
 };
 int Utils::line = 20;
+
+YLog Utils::ylog(YLog::INFO, "../log/log.txt", YLog::OVER);
 
 void Utils::printLog(string log){
     Utils::writeChar(5, Utils::line,log, 15);
