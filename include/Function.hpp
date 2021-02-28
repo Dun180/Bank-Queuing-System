@@ -23,6 +23,7 @@ class Function{
     vector<thread> wins_thread;//线程窗口 每个线程对应下标相同的窗口
     vector<BusinessWindow> wins;//窗口
     int numOfWindow = 3;
+    int firstWindow = -1;   //最先完成的窗口
     public:
     Function();
     void getNumber();   //取号
@@ -32,7 +33,8 @@ class Function{
     void callNumberAccordingToTime(); //根据时间叫号
     void createSimulation();  //创建模拟
     void transactionProcessing(int flag);   //事务处理
-    void multithreading();   //多个事务同时处理
+    void multithreading();   //多线程
+    void progressBar(int win); //进度条
 };
 Function::Function():ylog(YLog::INFO, "../log/log.txt", YLog::OVER){
     wait = new Queue<Customer>; //初始化队列
@@ -76,7 +78,6 @@ void Function::callNumber(){
     //判断窗口是否已满
     for(int i=0;i<numOfWindow;i++)
         {
-            this->ylog.W(__FILE__, __LINE__, YLog::INFO,"isNull",wins[i].getIsNull());
             if(wins[i].getIsNull()){
                 flag = true;
             }
@@ -138,17 +139,22 @@ void Function::createSimulation(){
     Utils::cleanConsole(18,40,9);//清除上一个数据
     Utils::writeChar(19, 9, to_string(waitTime), 15);//打印等待时间
 }
+ //进度条
+void Function::progressBar(int win){
+    Utils::writeChar(5, 3, "正在", 15);
+    Utils::writeChar(9, 3, to_string(win+1), 15);
+    Utils::writeChar(10, 3, "号窗口办理业务中", 15);
 
-//根据时间叫号
-void Function::callNumberAccordingToTime(){
-    Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
-    if(customer == NULL){
-        Utils::printLog("无等待人员，叫号失败");
-        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
-        return;
+    Utils::writeChar(5, 5, "[", 15);
+    Utils::writeChar(35, 5, "]", 15);
+    for(int i = 6; i <35;i++){
+        Utils::writeChar(i, 5, "#", 15);
+        Sleep(100);
     }
-    Sleep(1000*customer->getWaitTime());    //等候顾客处理事务
+    Utils::writeChar(5, 7, "办理成功", 15);
+    Sleep(2000);
 }
+
 
 //事务处理
 void Function::transactionProcessing(int identifier){
@@ -165,10 +171,14 @@ void Function::transactionProcessing(int identifier){
     //等待当前柜台人员办理业务
     Sleep(1000*wins[identifier].getCustomer()->getWaitTime());
     Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
-    if(customer == NULL){
-        Utils::printLog("无等待人员，叫号失败");
-        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+    {
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        if(customer == NULL){
+            Utils::printLog("无等待人员，叫号失败");
+            this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+            if(firstWindow < 0){firstWindow = identifier;}
         break;
+        }
     }
     wait->deQueue();//出队
     numberOfLine--; //排队人数减少
@@ -179,20 +189,24 @@ void Function::transactionProcessing(int identifier){
     }
 
     wins[identifier].setCustomer(customer);
-    Utils::writeChar(5+10*identifier, 12, customer->getStringNumber(), 15);
-
+    {
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        Utils::writeChar(5+10*identifier, 12, customer->getStringNumber(), 15);
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, to_string(identifier)+"号窗口正在办理业务的顾客为",customer->getStringNumber());
+    }
     }while(wait->getFront()->data != NULL);
 }
 
+//多线程
 void Function::multithreading(){
-    
-    for (int i = 0; i < 3; i++)
+
+    for (int i = 0; i < numOfWindow; i++)
     {
         Function::callNumber();
     }
     
    
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < numOfWindow; i++)
     {
         //printf("窗口%d就绪\n",i+1);
         wins_thread.emplace_back(std::thread(&Function::transactionProcessing,this,i));
@@ -209,6 +223,9 @@ void Function::multithreading(){
         wins_thread[i].join();
         
     }
+    Sleep(5000);
+    system("cls");
+    progressBar(firstWindow);
     //th1.join();
     //th2.join();
 
