@@ -6,8 +6,9 @@
 #include <conio.h>
 #include <windows.h>
 #include <cstdlib>
-#include <ctime>
+#include <vector>
 #include <thread>
+#include <mutex>
 #include "ylog.hpp"
 #define random(a,b) (rand() % (b-a+1))+ a;  //获取[a,b]的随机整数
 using namespace std;

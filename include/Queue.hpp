@@ -34,7 +34,7 @@ Queue<T>::Queue():ylog(YLog::INFO, "../log/log.txt", YLog::OVER){
     node->data = NULL;
     front = node;
     rear = node;
-    Utils::printLog("初始化成功");
+    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "初始化成功",ylogNull);
 }
 
 //入链队列
@@ -52,8 +52,7 @@ void Queue<T>::enQueue(T *data){
         rear->next = node;
         rear = node;
     }
-    Utils::printLog("入队成功");
-    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "let me watch a's value",ylogNull);
+    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "入队成功",ylogNull);
 
 }
 
@@ -62,19 +61,19 @@ template<class T>
 T *Queue<T>::deQueue(){
     //判断队列是否为空
     if(this->front == this->rear && this->front->data == NULL){//如果队列为空
-        Utils::printLog("队列为空，出队失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "队列为空，出队失败",ylogNull);
         return NULL;
     }else if(this->front == this->rear){//只有一个结点时
         Customer *customer = this->front->data;
         this->front->data = NULL;
-        Utils::printLog("出队成功(单结点");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "出队成功（单结点",ylogNull);
         return customer;
     }else{//有多个结点时
         Qnode<T> *node = this->front;
         this->front = this->front->next;//出队
         Customer *customer = node->data;
         delete node;
-        Utils::printLog("出队成功");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "出队成功",ylogNull);
         return customer;
     }
     return NULL;

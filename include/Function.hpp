@@ -17,6 +17,9 @@ class Function{
     Customer *counter2 = NULL;  //二号柜台
     Customer *counter3 = NULL;  //三号柜台
     Customer *counterVip = NULL;  //Vip柜台
+    YLog ylog;  //日志
+    mutex m;    //创建互斥锁对象
+    vector<thread> wins_thread;//线程窗口 每个线程对应下标相同的窗口
     public:
     Function();
     void getNumber();   //取号
@@ -28,7 +31,7 @@ class Function{
     void transactionProcessing(int flag);   //事务处理
     void multithreading();   //多个事务同时处理
 };
-Function::Function(){
+Function::Function():ylog(YLog::INFO, "../log/log.txt", YLog::OVER){
     wait = new Queue<Customer>; //初始化队列
 }
 //从1号开始取号
@@ -64,6 +67,7 @@ void Function::callNumber(){
     Customer *customer = wait->deQueue(); //出队
     if(customer == NULL){
         Utils::printLog("无等待人员，叫号失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
         return;
     }
     numberOfLine--; //排队人数减少
@@ -81,6 +85,7 @@ void Function::callNumber(){
     }
     }else{
         Utils::printLog("柜台已满，叫号失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "柜台已满，叫号失败",ylogNull);
     }
 }
 
@@ -89,6 +94,7 @@ void Function::callNumber(int flag){
     Customer *customer = wait->deQueue(); //出队
     if(customer == NULL){
         Utils::printLog("无等待人员，叫号失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
         return;
     }
     numberOfLine--; //排队人数减少
@@ -122,6 +128,7 @@ void Function::callNumberAccordingToTime(){
     Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
     if(customer == NULL){
         Utils::printLog("无等待人员，叫号失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
         return;
     }
     Sleep(1000*customer->getWaitTime());    //等候顾客处理事务
@@ -129,8 +136,14 @@ void Function::callNumberAccordingToTime(){
 
 //事务处理
 void Function::transactionProcessing(int flag){
+    this->ylog.W(__FILE__, __LINE__, YLog::INFO, "线程开始",flag);
+
+    //判断柜台是否为空
+
+
 
     do{
+    //lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
     //默认开始时柜台已满
     //判断执行工作的柜台
     Customer *counter = NULL;
@@ -147,12 +160,16 @@ void Function::transactionProcessing(int flag){
     Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
     if(customer == NULL){
         Utils::printLog("无等待人员，叫号失败");
+        this->ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
         break;
     }
     wait->deQueue();//出队
     numberOfLine--; //排队人数减少
-    Utils::cleanConsole(14,20,8);//清除上一个数据
-    Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
+    {
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        Utils::cleanConsole(14,20,8);//清除上一个数据
+        Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
+    }
     if(flag == 1){
         counter1 = customer;
         Utils::writeChar(5, 12, customer->getStringNumber(), 15);
@@ -169,11 +186,25 @@ void Function::transactionProcessing(int flag){
 
 void Function::multithreading(){
 
-
-    thread th1(&transactionProcessing,this,1);
-    thread th2(&transactionProcessing,this,2);
-    th1.join();
-    th2.join();
+        for (int i = 1; i < 4; i++)
+    {
+        //printf("窗口%d就绪\n",i+1);
+        wins_thread.emplace_back(std::thread(&Function::transactionProcessing,this,i));
+        //std::condition_variable temp;
+        //conds.push_back(temp);
+    }
+    //thread th1(&transactionProcessing,this,1);
+    //thread th2(&transactionProcessing,this,2);
+    //transactionProcessing(3);
+    
+    //中止线程
+        for (int i = 0; i < wins_thread.size(); i++)
+    {
+        wins_thread[i].join();
+        
+    }
+    //th1.join();
+    //th2.join();
 
 
 }
