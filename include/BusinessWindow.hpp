@@ -13,23 +13,29 @@ private:
     bool isNull; //是否为空
     int number; //窗口编号
     Customer *customer; //正在办理业务的顾客
+    int evaluateSum; //评价总分
+    int evaluateTime; //评价次数
 public:
     BusinessWindow() {}
-    BusinessWindow(bool isVip,int number){
+    BusinessWindow(bool isVip,int number, int evaluateTime, int evaluateSum){
         this->isVip = isVip;
         this->number = number;
         this->customer = NULL;
         this->isNull = true;
+        this->evaluateSum = evaluateSum;
+        this->evaluateTime = evaluateTime;
         }
     void setIsVip(bool isVip){this->isVip = isVip;}
     void setIsNull(bool isNull){this->isNull = isNull;}
     void setNumber(int number){this->number = number;}
     void setCustomer(Customer *customer){this->customer = customer;this->isNull = false;}
+    void setEvaluate(int evaluate){evaluateSum += evaluate;evaluateTime++;}
     string getStringNumber(){return to_string(number);}
     Customer* getCustomer(){return customer;}
     bool getIsVip(){return isVip;}
-    bool getIsNull(){return isNull;}
-
+    bool getIsNull(){return isNull;}    
+    int getEvaluateSum(){return this->evaluateSum;}
+    int getEvaluateTime(){return this->evaluateTime;}
 };
 
 #endif

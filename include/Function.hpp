@@ -34,15 +34,27 @@ class Function{
     void transactionProcessing(int flag);   //事务处理
     void multithreading();   //多线程
     void progressBar(int win); //进度条
+    void evaluate(int win);//评价
+    void sava();//保存评价
 };
 Function::Function(){
     wait = new Queue<Customer>; //初始化队列
     //初始化窗口
-    for(int i=0;i<numOfWindow;i++)
-        {
-            BusinessWindow w(false,i);
+    ifstream win_infile("../data/evaluation.txt",ios::in);//打开文件准备读取
+    if(!win_infile){
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "文件读取失败！",ylogNull);
+    }
+    for(int i=0;i<numOfWindow;i++){
+            int evaluateTime = 0; //评价次数
+            int evaluateSum = 0; //评价总分
+            win_infile >> evaluateTime >> evaluateSum;//读取
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口编号",i+1);
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价次数",evaluateTime);
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价总分",evaluateSum);
+            BusinessWindow w(false,i,evaluateTime,evaluateSum);
             wins.emplace_back(w);
-        }
+    }
+    win_infile.close();
 }
 //从1号开始取号
 int Function::number = 1;
@@ -199,7 +211,117 @@ void Function::transactionProcessing(int identifier){
     }while(wait->getFront()->data != NULL);
 }
 
-//多线程
+//评价
+void Function::evaluate(int win)
+{
+    system("cls");
+    array<string, 6> options = {
+        "☆",
+        "☆☆",
+        "☆☆☆",
+        "☆☆☆☆",
+        "☆☆☆☆☆",
+        "不做评价"
+        };
+    Utils::writeChar(5, 1, "请对"+to_string(win+1)+"号窗口的服务进行评价", 15);
+    Utils::writeChar(3, 3, "→", 15);
+    for (int i = 0; i < options.size(); i++)
+    {
+        Utils::writeChar(5, 3 + i, options[i], 15);
+    }
+    int key = 0;
+    char ch;
+    int option = 0;
+
+    bool flag = false;
+    while (true)
+    {
+        if (kbhit())
+        {
+            ch = getch();
+            if (ch == 27)
+            {
+                exit(0);
+            }
+            if (ch == 72 || ch == 80 || ch == '\r')
+            {
+                if (ch == 72)
+                {
+                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    option--;
+                }
+                else if (ch == 80)
+                {
+                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    option++;
+                }
+                if (option < 0)
+                {
+                    option = 0;
+                }
+                else if (option >= options.size())
+                {
+                    option--;
+                }
+                Utils::writeChar(3, 3 + option, "                         ", 0);
+                Sleep(100);
+                Utils::writeChar(3, 3 + option, "→", 15);
+                Utils::writeChar(5, 3 + option, options[option], 15);
+
+                if (ch == '\r')
+                {
+                    key = option;
+                    flag = true;
+                }
+            }
+        }
+        if (flag)
+            break;
+    }
+
+
+
+
+    if (key == 0)
+    {
+        wins[win].setEvaluate(1);
+    }
+    else if (key == 1)
+    {
+        wins[win].setEvaluate(2);
+    }
+    else if (key == 2)
+    {
+        wins[win].setEvaluate(3);
+    }
+    else if (key == 3){
+        wins[win].setEvaluate(4);
+    }
+    else if (key == 4){
+        wins[win].setEvaluate(5);
+    }
+    else if (key == 5){}
+    else
+    {
+        exit(-1);
+    }
+
+}
+
+//保存评价
+void Function::sava(){
+    ofstream win_outfile("../data/evaluation.txt",ios::out);
+    if(!win_outfile){
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "文件写入失败！",ylogNull);
+    }
+    vector<BusinessWindow>::iterator t;
+    for(t = wins.begin();t != wins.end();++t){
+        win_outfile<<t->getEvaluateTime()<<" "<<t->getEvaluateSum()<<"\n";
+    }
+    win_outfile.close();
+}
+
+//多线程实现
 void Function::multithreading(){
 
     for (int i = 0; i < numOfWindow; i++)
@@ -228,6 +350,8 @@ void Function::multithreading(){
     Sleep(5000);
     system("cls");
     progressBar(firstWindow);
+    evaluate(firstWindow);//评价
+    sava();//保存评价
     //th1.join();
     //th2.join();
 
