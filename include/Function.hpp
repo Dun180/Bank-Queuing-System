@@ -53,6 +53,7 @@ int Function::waitTime = 0;
 //取号
 void Function::getNumber(){
     Customer *customer = new Customer(false,number);    //创建Customer对象
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "创建顾客",customer->getStringNumber());
     number++;   //number递增
     numberOfLine++; //排队人数增加
     Utils::cleanConsole(14,20,8);//清除上一个数据
@@ -169,17 +170,19 @@ void Function::transactionProcessing(int identifier){
 
     //等待当前柜台人员办理业务
     Sleep(1000*wins[identifier].getCustomer()->getWaitTime());
-    Customer *customer = wait->getFront()->data;    //获取将要出队的顾客对象
+        Customer *customer = NULL;
     {
         lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        customer = wait->getFront()->data;    //获取将要出队的顾客对象
         if(customer == NULL){
             Utils::printLog("无等待人员，叫号失败");
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
             if(firstWindow < 0){firstWindow = identifier;}
         break;
         }
+        wait->deQueue();//出队
     }
-    wait->deQueue();//出队
+    
     numberOfLine--; //排队人数减少
     {
         lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
