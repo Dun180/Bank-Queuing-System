@@ -14,14 +14,11 @@ class Function{
     static int numberOfLine;//排队人数
     static int waitTime;   //等待时间
     Queue<Customer> *wait = NULL;   //排队等待队列
-    Customer *counter1 = NULL;  //一号柜台
-    Customer *counter2 = NULL;  //二号柜台
-    Customer *counter3 = NULL;  //三号柜台
-    Customer *counterVip = NULL;  //Vip柜台
+    BusinessWindow *vipWin = NULL;  //Vip窗口
     mutex m;    //创建互斥锁对象
     vector<thread> wins_thread;//线程窗口 每个线程对应下标相同的窗口
     vector<BusinessWindow> wins;//窗口
-    int numOfWindow = 3;
+    int numOfWindow = 3;    //窗口数量
     int firstWindow = -1;   //最先完成的窗口
     public:
     Function();
@@ -51,7 +48,7 @@ Function::Function(){
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口编号",i+1);
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价次数",evaluateTime);
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价总分",evaluateSum);
-            BusinessWindow w(false,i,evaluateTime,evaluateSum);
+            BusinessWindow w(i,evaluateTime,evaluateSum);
             wins.emplace_back(w);
     }
     win_infile.close();
@@ -129,16 +126,9 @@ void Function::callNumber(int flag){
     numberOfLine--; //排队人数减少
     Utils::cleanConsole(14,20,8);//清除上一个数据
     Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
-    if(flag == 1){
-        counter1 = customer;
-        Utils::writeChar(5, 12, customer->getStringNumber(), 15);
-    }else if(flag == 2){
-        counter2 = customer;
-        Utils::writeChar(15, 12, customer->getStringNumber(), 15);
-    }else if(flag == 3){
-        counter3 = customer;
-        Utils::writeChar(25, 12, customer->getStringNumber(), 15);
-    }
+    wins[flag].setCustomer(customer);
+    Utils::writeChar(5+flag*10, 12, customer->getStringNumber(), 15);
+
 }
 
 //创建模拟
@@ -188,7 +178,7 @@ void Function::transactionProcessing(int identifier){
         customer = wait->getFront()->data;    //获取将要出队的顾客对象
         if(customer == NULL){
             Utils::printLog("无等待人员，叫号失败");
-            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",identifier);
             if(firstWindow < 0){firstWindow = identifier;}
         break;
         }
@@ -215,13 +205,13 @@ void Function::transactionProcessing(int identifier){
 void Function::evaluate(int win)
 {
     system("cls");
-    array<string, 6> options = {
+    vector<string> options = {
         "☆",
         "☆☆",
         "☆☆☆",
         "☆☆☆☆",
         "☆☆☆☆☆",
-        "不做评价"
+        "不作评价"
         };
     Utils::writeChar(5, 1, "请对"+to_string(win+1)+"号窗口的服务进行评价", 15);
     Utils::writeChar(3, 3, "→", 15);
@@ -230,58 +220,9 @@ void Function::evaluate(int win)
         Utils::writeChar(5, 3 + i, options[i], 15);
     }
     int key = 0;
-    char ch;
     int option = 0;
-
     bool flag = false;
-    while (true)
-    {
-        if (kbhit())
-        {
-            ch = getch();
-            if (ch == 27)
-            {
-                exit(0);
-            }
-            if (ch == 72 || ch == 80 || ch == '\r')
-            {
-                if (ch == 72)
-                {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
-                    option--;
-                }
-                else if (ch == 80)
-                {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
-                    option++;
-                }
-                if (option < 0)
-                {
-                    option = 0;
-                }
-                else if (option >= options.size())
-                {
-                    option--;
-                }
-                Utils::writeChar(3, 3 + option, "                         ", 0);
-                Sleep(100);
-                Utils::writeChar(3, 3 + option, "→", 15);
-                Utils::writeChar(5, 3 + option, options[option], 15);
-
-                if (ch == '\r')
-                {
-                    key = option;
-                    flag = true;
-                }
-            }
-        }
-        if (flag)
-            break;
-    }
-
-
-
-
+    Utils::chooseUtil(option, key, flag, options);
     if (key == 0)
     {
         wins[win].setEvaluate(1);
@@ -354,7 +295,10 @@ void Function::multithreading(){
     sava();//保存评价
     //th1.join();
     //th2.join();
-
+    system("cls");
+    Utils::writeChar(5, 1, "感谢合作，再见！", 15);
+    Sleep(3000);
+    exit(0);
 
 }
 #endif

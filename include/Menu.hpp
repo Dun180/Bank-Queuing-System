@@ -12,10 +12,9 @@ class Menu{
 
 void Menu::mainMenu()
 {
-    array<string, 5> options = {
+    vector<string> options = {
         "取号",
         "叫号",
-        "线程模拟",
         "开始模拟",
         "退出"};
     system("mode con cols=110 lines=40");//规定大小
@@ -33,80 +32,31 @@ void Menu::mainMenu()
     }
     Function *function = new Function;
     int key = 0;
-    char ch;
     int option = 0;
     do{
-    bool flag = false;
-    while (true)
-    {
-        if (kbhit())
+        bool flag = false;
+        Utils::chooseUtil(option, key, flag, options);
+    
+        if (key == 0)
         {
-            ch = getch();
-            if (ch == 27)
-            {
-                exit(0);
-            }
-            if (ch == 72 || ch == 80 || ch == '\r')
-            {
-                if (ch == 72)
-                {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
-                    option--;
-                }
-                else if (ch == 80)
-                {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
-                    option++;
-                }
-                if (option < 0)
-                {
-                    option = 0;
-                }
-                else if (option >= options.size())
-                {
-                    option--;
-                }
-                Utils::writeChar(3, 3 + option, "                         ", 0);
-                Sleep(100);
-                Utils::writeChar(3, 3 + option, "→", 15);
-                Utils::writeChar(5, 3 + option, options[option], 15);
-
-                if (ch == '\r')
-                {
-                    key = option;
-                    flag = true;
-                }
-            }
+            function->getNumber();
         }
-        if (flag)
-            break;
-    }
-
-
-
-
-    if (key == 0)
-    {
-        function->getNumber();
-    }
-    else if (key == 1)
-    {
-        function->callNumber();
-    }
-    else if (key == 2)
-    {
-        function->multithreading();
-    }
-    else if (key == 3){
-        function->createSimulation();
-    }
-    else if (key == 4){
-        exit(0);
-    }
-    else
-    {
-        exit(-1);
-    }
+        else if (key == 1)
+        {
+            function->callNumber();
+        }
+        else if (key == 2)
+        {
+            function->createSimulation();
+            function->multithreading();
+        }
+        else if (key == 3){
+            exit(0);
+        }
+        else
+        {
+            exit(-1);
+        }
     }while(1);
 }
 

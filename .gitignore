@@ -48,3 +48,6 @@ samples/*
 
 # error
 error/*
+
+# data
+data/*

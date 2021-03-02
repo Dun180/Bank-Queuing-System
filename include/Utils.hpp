@@ -2,7 +2,6 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 #include <iostream>
-#include <array>
 #include <conio.h>
 #include <windows.h>
 #include <cstdlib>
@@ -10,20 +9,21 @@
 #include <thread>
 #include <mutex>
 #include "ylog.hpp"
-#define random(a,b) (rand() % (b-a+1))+ a;  //è·å–[a,b]çš„éšæœºæ•´æ•°
+#define random(a,b) (rand() % (b-a+1))+ a;  //»ñÈ¡[a,b]µÄËæ»úÕûÊı
 using namespace std;
 
 char ylogNull = '\0';
 /*
-* å·¥å…·ç±»
+* ¹¤¾ßÀà
 */
 class Utils{
 private:
     static int line;
 public:
-    void static writeChar(short x, short y, string pchar, char color);//è¾“å‡º
-    void static cleanConsole(short xStart,short xEnd, short y);//æ¸…ç©ºæŒ‡å®šå†…å®¹
-    void static printLog(string log);//æ‰“å°æ—¥å¿—
+    void static writeChar(short x, short y, string pchar, char color);//Êä³ö
+    void static cleanConsole(short xStart,short xEnd, short y);//Çå¿ÕÖ¸¶¨ÄÚÈİ
+    void static printLog(string log);//´òÓ¡ÈÕÖ¾
+    void static chooseUtil(int &option, int &key, bool &flag, vector<string> &options);
     YLog static ylog;
 };
 int Utils::line = 20;
@@ -58,6 +58,54 @@ void Utils::cleanConsole(short xStart,short xEnd, short y)
         cout << " " << endl;
         ;
     }
+}
+void Utils::chooseUtil(int &option, int &key, bool &flag, vector<string> &options){
+    while (true)
+    {
+        if (kbhit())
+        {
+            char ch;
+            ch = getch();
+            if (ch == 27)
+            {
+                exit(0);
+            }
+            if (ch == 72 || ch == 80 || ch == '\r')
+            {
+                if (ch == 72)
+                {
+                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    option--;
+                }
+                else if (ch == 80)
+                {
+                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    option++;
+                }
+                if (option < 0)
+                {
+                    option = 0;
+                }
+                else if (option >= options.size())
+                {
+                    option--;
+                }
+                Utils::writeChar(3, 3 + option, "                         ", 0);
+                Sleep(100);
+                Utils::writeChar(3, 3 + option, "¡ú", 15);
+                Utils::writeChar(5, 3 + option, options[option], 15);
+
+                if (ch == '\r')
+                {
+                    key = option;
+                    flag = true;
+                }
+            }
+        }
+        if (flag)
+            break;
+    }
+
 }
 
 #endif
