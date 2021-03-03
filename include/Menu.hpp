@@ -5,9 +5,14 @@
 #include "Utils.hpp"
 #include "Function.hpp"
 class Menu{
+    private:
+    Function *function = NULL;
     public:
-    void static mainMenu();
-    void static vipMenu();
+    Menu(){
+        function = new Function();
+    }
+    void mainMenu();
+    void vipMenu();
 
 };
 
@@ -32,7 +37,6 @@ void Menu::mainMenu()
     {
         Utils::writeChar(5, 3 + i, options[i], 15);
     }
-    Function *function = new Function;
     int key = 0;
     int option = 0;
     do{
@@ -72,7 +76,6 @@ void Menu::vipMenu()
     {
         Utils::writeChar(18, 5 + i, options[i], 15);
     }
-    Function *function = new Function;
     int key = 0;
     int option = 0;
     do{
