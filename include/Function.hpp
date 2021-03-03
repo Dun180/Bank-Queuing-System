@@ -10,10 +10,13 @@
 */
 class Function{
     private:
-    static int number;  //编号
-    static int numberOfLine;//排队人数
-    static int waitTime;   //等待时间
+    int number;  //编号
+    int numberOfLine;//排队人数
+    int waitTime;   //等待时间
+    int vipNumber; //vip编号
+    int vipWaitNumber; //vip排队人数
     Queue<Customer> *wait = NULL;   //排队等待队列
+    Queue<Customer> *vipWait = NULL; //vip等候队列
     BusinessWindow *vipWin = NULL;  //Vip窗口
     mutex m;    //创建互斥锁对象
     vector<thread> wins_thread;//线程窗口 每个线程对应下标相同的窗口
@@ -22,7 +25,9 @@ class Function{
     int firstWindow = -1;   //最先完成的窗口
     public:
     Function();
+    ~Function();
     void getNumber();   //取号
+    void getVipNumber();    //vip取号
     Customer *getCustomerNumber();   //取号(返回Customer对象)
     void callNumber();  //叫号(柜台未满时)
     void callNumber(int num);  //叫号
@@ -33,32 +38,45 @@ class Function{
     void progressBar(int win); //进度条
     void evaluate(int win);//评价
     void sava();//保存评价
+    void vipWindow();   //vip窗口
 };
 Function::Function(){
+    number = 1; //初始化排队编号
+    vipNumber = 1;  //初始化vip编号
+    numberOfLine = 0;   //初始化排队人数
+    waitTime = 0;   //初始化等待时间
+    vipWaitNumber = 0;  //初始化vip排队人数
     wait = new Queue<Customer>; //初始化队列
+    vipWait = new Queue<Customer>;//初始化vip队列
     //初始化窗口
     ifstream win_infile("../data/evaluation.txt",ios::in);//打开文件准备读取
     if(!win_infile){
         Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "文件读取失败！",ylogNull);
     }
+    int evaluateTime = 0; //评价次数
+    int evaluateSum = 0; //评价总分
     for(int i=0;i<numOfWindow;i++){
-            int evaluateTime = 0; //评价次数
-            int evaluateSum = 0; //评价总分
             win_infile >> evaluateTime >> evaluateSum;//读取
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口编号",i+1);
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价次数",evaluateTime);
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价总分",evaluateSum);
-            BusinessWindow w(i,evaluateTime,evaluateSum);
+            BusinessWindow w(false, i, evaluateTime, evaluateSum);
             wins.emplace_back(w);
     }
+    win_infile >> evaluateTime >> evaluateSum;//
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口编号","vip");
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价次数",evaluateTime);
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "评价总分",evaluateSum);
+    vipWin = new BusinessWindow(true, -1, evaluateTime, evaluateSum);
     win_infile.close();
 }
-//从1号开始取号
-int Function::number = 1;
-//排队人数
-int Function::numberOfLine = 0;
-//等待时间
-int Function::waitTime = 0;
+Function::~Function(){
+    delete(wait);
+    delete(vipWin);
+}
+
+
+
 //取号
 void Function::getNumber(){
     Customer *customer = new Customer(false,number);    //创建Customer对象
@@ -68,6 +86,17 @@ void Function::getNumber(){
     Utils::cleanConsole(14,20,8);//清除上一个数据
     Utils::writeChar(15, 8, to_string(numberOfLine), 15);//打印排队人数
     wait->enQueue(customer);   //入等待队列
+}
+
+//vip取号
+void Function::getVipNumber(){
+    Customer *customer = new Customer(true,vipNumber);    //创建Customer对象
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "创建vip",customer->getStringNumber());
+    vipNumber++;   //number递增
+    vipWaitNumber++; //排队人数增加
+    Utils::cleanConsole(47,53,8);//清除上一个数据
+    Utils::writeChar(48, 8, to_string(vipWaitNumber), 15);//打印排队人数
+    vipWait->enQueue(customer);   //入等待队列
 }
 
 //取号(返回Customer对象)
@@ -162,10 +191,6 @@ void Function::progressBar(int win){
 void Function::transactionProcessing(int identifier){
     Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "线程开始",identifier);
 
-    //判断柜台是否为空
-
-
-
     do{
     //lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
     //默认开始时柜台已满
@@ -222,7 +247,7 @@ void Function::evaluate(int win)
     int key = 0;
     int option = 0;
     bool flag = false;
-    Utils::chooseUtil(option, key, flag, options);
+    Utils::chooseUtil(option, key, flag, 3, 3, options);
     if (key == 0)
     {
         wins[win].setEvaluate(1);
@@ -259,6 +284,9 @@ void Function::sava(){
     for(t = wins.begin();t != wins.end();++t){
         win_outfile<<t->getEvaluateTime()<<" "<<t->getEvaluateSum()<<"\n";
     }
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "普通窗口写入成功",ylogNull);
+    win_outfile<<vipWin->getEvaluateTime()<<" "<<vipWin->getEvaluateSum()<<"\n";
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "vip窗口写入成功",ylogNull);
     win_outfile.close();
 }
 
@@ -273,14 +301,10 @@ void Function::multithreading(){
    
         for (int i = 0; i < numOfWindow; i++)
     {
-        //printf("窗口%d就绪\n",i+1);
         wins_thread.emplace_back(std::thread(&Function::transactionProcessing,this,i));
         //std::condition_variable temp;
         //conds.push_back(temp);
     }
-    //thread th1(&transactionProcessing,this,1);
-    //thread th2(&transactionProcessing,this,2);
-    //transactionProcessing(3);
     
     //中止线程
         for (int i = 0; i < wins_thread.size(); i++)
@@ -293,12 +317,40 @@ void Function::multithreading(){
     progressBar(firstWindow);
     evaluate(firstWindow);//评价
     sava();//保存评价
-    //th1.join();
-    //th2.join();
     system("cls");
     Utils::writeChar(5, 1, "感谢合作，再见！", 15);
     Sleep(3000);
     exit(0);
+
+}
+
+//vip
+void Function::vipWindow(){
+
+    int wait = random(2,5);  //随机生成2~5个排队等待人员
+    for(int i = 0; i < wait; i++){
+        getVipNumber();    //取号
+        waitTime += random(3,6);    //随机生成3~6秒的等待时间
+    }
+
+
+    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "vip窗口开始",ylogNull);
+
+
+    do{
+    Customer *customer = vipWait->deQueue(); //出队
+    if(customer == NULL){
+            Utils::printLog("无等待人员，叫号失败");
+            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+            return;
+    }
+    vipWaitNumber--; //排队人数减少
+    Utils::cleanConsole(47,53,8);//清除上一个数据
+    Utils::writeChar(48, 8, to_string(vipWaitNumber), 15);//打印排队人数
+    Utils::writeChar(35, 12, customer->getStringNumber(), 15);
+    vipWin->setCustomer(customer);
+    Sleep(1000*customer->getWaitTime());
+    }while(vipWait->getFront()->data != NULL);
 
 }
 #endif

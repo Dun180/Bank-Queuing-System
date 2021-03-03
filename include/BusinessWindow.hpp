@@ -9,6 +9,7 @@
 class BusinessWindow
 {
 private:
+    bool isVip;   //是否为VIP
     bool isNull; //是否为空
     int number; //窗口编号
     Customer *customer; //正在办理业务的顾客
@@ -16,7 +17,8 @@ private:
     int evaluateTime; //评价次数
 public:
     BusinessWindow() {}
-    BusinessWindow(int number, int evaluateTime, int evaluateSum){
+    BusinessWindow(int isVip, int number, int evaluateTime, int evaluateSum){
+        this->isVip = isVip;
         this->number = number;
         this->customer = NULL;
         this->isNull = true;

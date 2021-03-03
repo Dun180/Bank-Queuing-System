@@ -23,7 +23,7 @@ public:
     void static writeChar(short x, short y, string pchar, char color);//输出
     void static cleanConsole(short xStart,short xEnd, short y);//清空指定内容
     void static printLog(string log);//打印日志
-    void static chooseUtil(int &option, int &key, bool &flag, vector<string> &options);
+    void static chooseUtil(int &option, int &key, bool &flag, int x, int y, vector<string> &options);
     YLog static ylog;
 };
 int Utils::line = 20;
@@ -59,7 +59,7 @@ void Utils::cleanConsole(short xStart,short xEnd, short y)
         ;
     }
 }
-void Utils::chooseUtil(int &option, int &key, bool &flag, vector<string> &options){
+void Utils::chooseUtil(int &option, int &key, bool &flag, int x, int y, vector<string> &options){
     while (true)
     {
         if (kbhit())
@@ -74,12 +74,12 @@ void Utils::chooseUtil(int &option, int &key, bool &flag, vector<string> &option
             {
                 if (ch == 72)
                 {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    Utils::writeChar(x, y + option, "  ", 0);
                     option--;
                 }
                 else if (ch == 80)
                 {
-                    Utils::writeChar(3, 3 + option, "  ", 0);
+                    Utils::writeChar(x, y + option, "  ", 0);
                     option++;
                 }
                 if (option < 0)
@@ -90,10 +90,10 @@ void Utils::chooseUtil(int &option, int &key, bool &flag, vector<string> &option
                 {
                     option--;
                 }
-                Utils::writeChar(3, 3 + option, "                         ", 0);
+                Utils::writeChar(x, y + option, "                         ", 0);
                 Sleep(100);
-                Utils::writeChar(3, 3 + option, "→", 15);
-                Utils::writeChar(5, 3 + option, options[option], 15);
+                Utils::writeChar(x, y + option, "→", 15);
+                Utils::writeChar(x+2, y + option, options[option], 15);
 
                 if (ch == '\r')
                 {
