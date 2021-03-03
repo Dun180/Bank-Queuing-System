@@ -23,6 +23,7 @@ class Function{
     vector<BusinessWindow> wins;//窗口
     int numOfWindow = 3;    //窗口数量
     int firstWindow = -1;   //最先完成的窗口
+    bool threadFlag;    //线程提前终止的标志
     public:
     Function();
     ~Function();
@@ -48,6 +49,7 @@ Function::Function(){
     vipWaitNumber = 0;  //初始化vip排队人数
     wait = new Queue<Customer>; //初始化队列
     vipWait = new Queue<Customer>;//初始化vip队列
+    threadFlag = false; 
     //初始化窗口
     ifstream win_infile("../data/evaluation.txt",ios::in);//打开文件准备读取
     if(!win_infile){
@@ -197,11 +199,12 @@ void Function::transactionProcessing(int identifier){
 
     //等待当前柜台人员办理业务
     Sleep(1000*wins[identifier].getCustomer()->getWaitTime());
-        Customer *customer = NULL;
+    if(threadFlag) return;
+    Customer *customer = NULL;
     {
-        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
         customer = wait->getFront()->data;    //获取将要出队的顾客对象
         if(customer == NULL){
+            lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
             Utils::printLog("无等待人员，叫号失败");
             Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",identifier);
             if(firstWindow < 0){firstWindow = identifier;}
@@ -248,23 +251,9 @@ void Function::evaluate(int win)
     int option = 0;
     bool flag = false;
     Utils::chooseUtil(option, key, flag, 3, 3, options);
-    if (key == 0)
+    if (key >= 0 && key < 5)
     {
-        wins[win].setEvaluate(1);
-    }
-    else if (key == 1)
-    {
-        wins[win].setEvaluate(2);
-    }
-    else if (key == 2)
-    {
-        wins[win].setEvaluate(3);
-    }
-    else if (key == 3){
-        wins[win].setEvaluate(4);
-    }
-    else if (key == 4){
-        wins[win].setEvaluate(5);
+        wins[win].setEvaluate(key+1);
     }
     else if (key == 5){}
     else
@@ -292,20 +281,18 @@ void Function::sava(){
 
 //多线程实现
 void Function::multithreading(){
-
+    
+    createSimulation();//创建模拟
     for (int i = 0; i < numOfWindow; i++)
     {
         Function::callNumber();
     }
-    
-   
         for (int i = 0; i < numOfWindow; i++)
     {
         wins_thread.emplace_back(std::thread(&Function::transactionProcessing,this,i));
-        //std::condition_variable temp;
-        //conds.push_back(temp);
+
     }
-    
+        wins_thread.emplace_back(std::thread(&Function::vipWindow,this));
     //中止线程
         for (int i = 0; i < wins_thread.size(); i++)
     {
@@ -326,31 +313,94 @@ void Function::multithreading(){
 
 //vip
 void Function::vipWindow(){
+    createSimulation();//创建模拟
+    for (int i = 0; i < numOfWindow; i++)
+    {
+        Function::callNumber();
+    }
+        for (int i = 0; i < numOfWindow; i++)
+    {
+        wins_thread.emplace_back(std::thread(&Function::transactionProcessing,this,i));
+
+    }
+
+
 
     int wait = random(2,5);  //随机生成2~5个排队等待人员
     for(int i = 0; i < wait; i++){
         getVipNumber();    //取号
         waitTime += random(3,6);    //随机生成3~6秒的等待时间
     }
-
-
-    Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "vip窗口开始",ylogNull);
-
+    {
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "vip窗口开始",ylogNull);
+    }
 
     do{
     Customer *customer = vipWait->deQueue(); //出队
     if(customer == NULL){
-            Utils::printLog("无等待人员，叫号失败");
-            Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
-            return;
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        Utils::printLog("无等待人员，叫号失败");
+        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "无等待人员，叫号失败",ylogNull);
+        return;
     }
     vipWaitNumber--; //排队人数减少
-    Utils::cleanConsole(47,53,8);//清除上一个数据
-    Utils::writeChar(48, 8, to_string(vipWaitNumber), 15);//打印排队人数
-    Utils::writeChar(35, 12, customer->getStringNumber(), 15);
+    {
+        lock_guard<mutex> guard(m);  //创建lock_guard的类对象guard，用互斥量m来构造
+        Utils::cleanConsole(47,53,8);//清除上一个数据
+        Utils::writeChar(48, 8, to_string(vipWaitNumber), 15);//打印排队人数
+        Utils::writeChar(35, 12, 'V'+customer->getStringNumber(), 15);
+    }
     vipWin->setCustomer(customer);
     Sleep(1000*customer->getWaitTime());
     }while(vipWait->getFront()->data != NULL);
 
+    threadFlag = true;//终止线程
+    Sleep(1000);
+    system("cls");
+    Utils::writeChar(5, 3, "正在VIP窗口办理业务中", 15);
+
+    Utils::writeChar(5, 5, "[", 15);
+    Utils::writeChar(35, 5, "]", 15);
+    for(int i = 6; i <35;i++){
+        Utils::writeChar(i, 5, "#", 15);
+        Sleep(100);
+    }
+    Utils::writeChar(5, 7, "办理成功", 15);
+    Sleep(2000);
+        system("cls");
+    vector<string> options = {
+        "☆",
+        "☆☆",
+        "☆☆☆",
+        "☆☆☆☆",
+        "☆☆☆☆☆",
+        "不作评价"
+        };
+    Utils::writeChar(5, 1, "请对VIP窗口的服务进行评价", 15);
+    Utils::writeChar(3, 3, "→", 15);
+    for (int i = 0; i < options.size(); i++)
+    {
+        Utils::writeChar(5, 3 + i, options[i], 15);
+    }
+    int key = 0;
+    int option = 0;
+    bool flag = false;
+    Utils::chooseUtil(option, key, flag, 3, 3, options);
+    if (key >= 0 && key < 5)
+    {
+        vipWin->setEvaluate(key+1);
+    }
+    else if (key == 5){}
+    else
+    {
+        exit(-1);
+    }
+
+    sava();//保存评价
+    system("cls");
+    Utils::writeChar(5, 1, "感谢合作，再见！", 15);
+    Sleep(3000);
+    exit(0);
 }
 #endif

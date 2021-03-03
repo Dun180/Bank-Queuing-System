@@ -27,7 +27,7 @@ void Menu::mainMenu()
     Utils::writeChar(5, 1, "欢迎进入银行排队模拟系统！", 15);
     Utils::writeChar(3, 3, "→", 15);
     Utils::writeChar(5, 8, "排队人数：", 15);
-    Utils::writeChar(35, 8, "vip通道人数：", 15);
+    Utils::writeChar(35, 8, "VIP通道人数：", 15);
     Utils::writeChar(5, 9, "预计等待时间：", 15);
     Utils::writeChar(5, 11, "一号柜台", 15);
     Utils::writeChar(15, 11, "二号柜台", 15);
@@ -84,7 +84,6 @@ void Menu::vipMenu()
     
         if (key == 0)
         {
-            function->createSimulation();
             function->multithreading();
         }
         else if (key == 1)
