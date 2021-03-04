@@ -34,6 +34,11 @@ public:
     bool getIsNull(){return isNull;}    
     int getEvaluateSum(){return this->evaluateSum;}
     int getEvaluateTime(){return this->evaluateTime;}
+    string getEvaluate(){
+        double sum = (double)evaluateSum;
+        double time = (double)evaluateTime;
+        double evaluate = sum/time;
+        return to_string(evaluate).substr(0,3);}
 };
 
 #endif

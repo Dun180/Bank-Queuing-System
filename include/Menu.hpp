@@ -6,18 +6,15 @@
 #include "Function.hpp"
 class Menu{
     private:
-    Function *function = NULL;
     public:
-    Menu(){
-        function = new Function();
-    }
-    void mainMenu();
-    void vipMenu();
+    void static mainMenu();
+    void static vipMenu(Function *function);
 
 };
 
 void Menu::mainMenu()
 {
+    system("cls");
     vector<string> options = {
         "取号",
         "叫号",
@@ -29,6 +26,7 @@ void Menu::mainMenu()
     Utils::writeChar(5, 8, "排队人数：", 15);
     Utils::writeChar(35, 8, "VIP通道人数：", 15);
     Utils::writeChar(5, 9, "预计等待时间：", 15);
+    Utils::writeChar(35, 9, "Vip等待时间：", 15);
     Utils::writeChar(5, 11, "一号柜台", 15);
     Utils::writeChar(15, 11, "二号柜台", 15);
     Utils::writeChar(25, 11, "三号柜台", 15);
@@ -40,6 +38,7 @@ void Menu::mainMenu()
     int key = 0;
     int option = 0;
     do{
+        Function *function = new Function();
         bool flag = false;
         Utils::chooseUtil(option, key, flag, 3, 3, options);
     
@@ -53,7 +52,7 @@ void Menu::mainMenu()
         }
         else if (key == 2)
         {
-            vipMenu();
+            vipMenu(function);
         }
         else if (key == 3){
             exit(0);
@@ -64,7 +63,7 @@ void Menu::mainMenu()
         }
     }while(1);
 }
-void Menu::vipMenu()
+void Menu::vipMenu(Function *function)
 {
     vector<string> options = {
         "普通客户",
