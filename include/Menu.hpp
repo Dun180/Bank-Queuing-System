@@ -31,6 +31,7 @@ void Menu::mainMenu()
     Utils::writeChar(15, 11, "二号柜台", 15);
     Utils::writeChar(25, 11, "三号柜台", 15);
     Utils::writeChar(35, 11, "VIP柜台", 15);
+    Function *function = new Function();
     for (int i = 0; i < options.size(); i++)
     {
         Utils::writeChar(5, 3 + i, options[i], 15);
@@ -38,7 +39,7 @@ void Menu::mainMenu()
     int key = 0;
     int option = 0;
     do{
-        Function *function = new Function();
+        
         bool flag = false;
         Utils::chooseUtil(option, key, flag, 3, 3, options);
     

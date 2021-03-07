@@ -27,6 +27,7 @@ class Function{
     bool threadFlag;    //线程提前终止的标志
     bool threadFlag2;    //线程提前终止的标志
     bool countFlag;     //倒计时终止的标志
+    int winflag; //窗口标志
     public:
     Function();
     ~Function();
@@ -61,6 +62,7 @@ Function::Function(){
     threadFlag = false; 
     threadFlag2 = false; 
     countFlag = false; 
+    winflag = 0;
     //初始化窗口
     ifstream win_infile("../data/evaluation.txt",ios::in);//打开文件准备读取
     if(!win_infile){
@@ -153,7 +155,13 @@ void Function::callNumber(){
         }
     
     }else{
-        Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口已满，退出",ylogNull);
+        Customer *customer = wait->getFront()->data; //
+        //Utils::ylog.W(__FILE__, __LINE__, YLog::INFO, "窗口已满，退出",ylogNull);
+        if(customer!=NULL){
+            callNumber(winflag);
+            ++winflag;
+            if(winflag == 3) winflag = 0;
+        }
     }
 }
 
